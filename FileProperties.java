@@ -13,6 +13,7 @@ public class FileProperties {
         this.compressionMethod = compressionMethod;
     }
 
+
     public String getName() {
         return name;
     }
@@ -29,12 +30,26 @@ public class FileProperties {
         return compressionMethod;
     }
 
-    public long getCompressionRatio(){
+    public long getCompressionRatio() {
+        // Вычисляем степень сжатия
         return 100 - ((compressedSize * 100) / size);
     }
 
     @Override
     public String toString() {
-        return String.format("%s %d Kb (%d Kb) сжатие: %d%%",name,size/1024,compressedSize/1024,getCompressionRatio());
+        // Строим красивую строку из свойств
+        StringBuilder builder = new StringBuilder();
+        builder.append(name);
+        if (size > 0) {
+            builder.append("\t");
+            builder.append(size / 1024);
+            builder.append(" Kb (");
+            builder.append(compressedSize / 1024);
+            builder.append(" Kb) сжатие: ");
+            builder.append(getCompressionRatio());
+            builder.append("%");
+        }
+
+        return builder.toString();
     }
 }
