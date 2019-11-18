@@ -6,9 +6,9 @@ import com.javarush.task.task31.task3110.exception.WrongZipFileException;
 import java.io.ByteArrayOutputStream;
 import java.io.InputStream;
 import java.io.OutputStream;
-import java.nio.file.Files;
-import java.nio.file.Path;
+import java.nio.file.*;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
@@ -49,6 +49,37 @@ public class ZipFileManager {
 
                 // Если переданный source не директория и не файл, бросаем исключение
                 throw new PathIsNotFoundException();
+            }
+        }
+    }
+
+    public void extractAll(Path outputFolder) throws Exception {
+        // Проверяем существует ли zip файл
+        if (!Files.isRegularFile(zipFile)) {
+            throw new WrongZipFileException();
+        }
+
+        try (ZipInputStream zipInputStream = new ZipInputStream(Files.newInputStream(zipFile))) {
+            // Создаем директорию вывода, если она не существует
+            if (Files.notExists(outputFolder))
+                Files.createDirectories(outputFolder);
+
+            // Проходимся по содержимому zip потока (файла)
+            ZipEntry zipEntry = zipInputStream.getNextEntry();
+
+            while (zipEntry != null) {
+                String fileName = zipEntry.getName();
+                Path fileFullName = outputFolder.resolve(fileName);
+
+                // Создаем необходимые директории
+                Path parent = fileFullName.getParent();
+                if (Files.notExists(parent))
+                    Files.createDirectories(parent);
+
+                try (OutputStream outputStream = Files.newOutputStream(fileFullName)) {
+                    copyData(zipInputStream, outputStream);
+                }
+                zipEntry = zipInputStream.getNextEntry();
             }
         }
     }
@@ -100,24 +131,32 @@ public class ZipFileManager {
         }
     }
 
-    public void extractAll(Path outputFolder) throws Exception {
+    public void removeFiles (List <Path> pathList) throws Exception {
         if (!Files.isRegularFile(zipFile)) {
             throw new WrongZipFileException();
         }
-        if (!Files.exists(outputFolder)){
-            Files.createDirectories(outputFolder);
+        Path tempFile = Files.createTempFile("zip","_temp");
+        try (ZipInputStream zis = new ZipInputStream(Files.newInputStream(zipFile));
+             ZipOutputStream zos = new ZipOutputStream(Files.newOutputStream(tempFile))){
+            ZipEntry entry;
+            while ((entry=zis.getNextEntry())!=null){
+
+                if (pathList.contains(Paths.get(entry.getName()))){
+                    ConsoleHelper.writeMessage(String.format("Файл %s удалён",entry.getName()));
+                }
+                else {
+                    ZipEntry tempEntry = new ZipEntry(entry.getName());
+                    zos.putNextEntry(tempEntry);
+                    copyData(zis, zos);
+                }
+            }
         }
-        try (ZipInputStream zis = new ZipInputStream(Files.newInputStream(zipFile))){
-             ZipEntry entry;
-             while ((entry=zis.getNextEntry())!=null){
-                 Path newPath = outputFolder.resolve(entry.getName());
-                 if (!Files.exists(newPath.getParent())) {
-                     Files.createDirectories(newPath.getParent());
-                 }
-                 try(OutputStream fos = Files.newOutputStream(newPath)) {
-                     copyData(zis,fos);
-                 }
-             }
-        }
+        Files.move(tempFile, zipFile, StandardCopyOption.REPLACE_EXISTING);
     }
+
+    public void removeFile(Path path) throws Exception {
+        List <Path> list = Collections.singletonList(path);
+        removeFiles(list);
+    }
+
 }
