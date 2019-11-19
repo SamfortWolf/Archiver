@@ -1,8 +1,8 @@
-package com.javarush.task.task31.task3110.command;
+package archiever.command;
 
-import com.javarush.task.task31.task3110.ConsoleHelper;
-import com.javarush.task.task31.task3110.ZipFileManager;
-import com.javarush.task.task31.task3110.exception.PathIsNotFoundException;
+import archiever.ConsoleHelper;
+import archiever.ZipFileManager;
+import archiever.exception.PathIsNotFoundException;
 
 import java.nio.file.Path;
 import java.nio.file.Paths;

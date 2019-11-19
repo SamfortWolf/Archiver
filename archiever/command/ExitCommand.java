@@ -1,6 +1,6 @@
-package com.javarush.task.task31.task3110.command;
+package archiever.command;
 
-import com.javarush.task.task31.task3110.ConsoleHelper;
+import archiever.ConsoleHelper;
 
 public class ExitCommand implements Command {
     @Override

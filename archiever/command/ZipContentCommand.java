@@ -1,8 +1,8 @@
-package com.javarush.task.task31.task3110.command;
+package archiever.command;
 
-import com.javarush.task.task31.task3110.ConsoleHelper;
-import com.javarush.task.task31.task3110.FileProperties;
-import com.javarush.task.task31.task3110.ZipFileManager;
+import archiever.ConsoleHelper;
+import archiever.FileProperties;
+import archiever.ZipFileManager;
 
 import java.util.List;
 

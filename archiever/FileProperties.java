@@ -1,4 +1,4 @@
-package com.javarush.task.task31.task3110;
+package archiever;
 
 public class FileProperties {
     private String name;
